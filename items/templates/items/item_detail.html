@@ -1,0 +1,223 @@
+{% extends 'items/base.html' %}
+
+{% block title %}{{ item.title }} - Casa Betti{% endblock %}
+
+{% block content %}
+<div x-data="itemDetailApp()" x-init="initGallery()">
+    <!-- Back Button -->
+    <div class="mb-4">
+        <a href="{% url 'item_list' %}" class="btn btn-outline-primary">
+            ← Torna alla bacheca
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Image Gallery -->
+        <div class="col-lg-8">
+            {% if item.images.all %}
+            <div class="card">
+                <div class="position-relative">
+                    <!-- Main Image -->
+                    <img
+                        :src="currentImage.url"
+                        :alt="currentImage.alt || '{{ item.title }}'"
+                        class="card-img-top"
+                        style="height: 400px; object-fit: cover; cursor: pointer;"
+                        @click="openLightbox()"
+                    >
+
+                    <!-- Navigation Arrows -->
+                    <button
+                        class="btn btn-dark position-absolute top-50 start-0 translate-middle-y ms-2"
+                        @click="previousImage()"
+                        x-show="images.length > 1"
+                        style="opacity: 0.8;"
+                    >
+                        &#8249;
+                    </button>
+                    <button
+                        class="btn btn-dark position-absolute top-50 end-0 translate-middle-y me-2"
+                        @click="nextImage()"
+                        x-show="images.length > 1"
+                        style="opacity: 0.8;"
+                    >
+                        &#8250;
+                    </button>
+
+                    <!-- Image Counter -->
+                    <div class="position-absolute bottom-0 end-0 m-2">
+                        <span class="badge bg-dark">
+                            <span x-text="currentIndex + 1"></span>/<span x-text="images.length"></span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Thumbnail Strip -->
+                <div class="card-body" x-show="images.length > 1">
+                    <div class="d-flex gap-2 overflow-auto">
+                        <template x-for="(image, index) in images" :key="index">
+                            <img
+                                :src="image.thumbnail"
+                                :alt="'Miniatura ' + (index + 1)"
+                                class="thumbnail"
+                                :class="{ 'active': index === currentIndex }"
+                                @click="setCurrentImage(index)"
+                                style="width: 80px; height: 60px; object-fit: cover; cursor: pointer; border: 2px solid transparent; border-radius: 4px;"
+                                :style="index === currentIndex ? 'border-color: #007bff;' : ''"
+                            >
+                        </template>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                    <p class="text-muted mt-2">Nessuna immagine disponibile</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Item Details -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="h3 mb-0">{{ item.title }}</h1>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <span class="badge bg-primary fs-5">€{{ item.price }}</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <small class="text-muted">Categoria:</small><br>
+                        <span class="badge bg-light text-dark">{{ item.get_category_display }}</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <small class="text-muted">Stato:</small><br>
+                        <span class="badge bg-success">{{ item.get_status_display }}</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6>Descrizione:</h6>
+                        <p>{{ item.description|linebreaks }}</p>
+                    </div>
+
+                    <hr>
+
+                    <div class="text-muted small">
+                        <p class="mb-1">Pubblicato: {{ item.created_at|date:"d/m/Y" }}</p>
+                        {% if item.updated_at != item.created_at %}
+                        <p class="mb-0">Aggiornato: {{ item.updated_at|date:"d/m/Y" }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lightbox Modal -->
+    <div
+        x-show="lightboxOpen"
+        class="modal fade show"
+        style="display: block; background: rgba(0,0,0,0.8);"
+        @click.self="closeLightbox()"
+        x-transition
+    >
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content bg-transparent border-0">
+                <div class="position-relative">
+                    <img
+                        :src="currentImage.url"
+                        :alt="currentImage.alt || '{{ item.title }}'"
+                        class="w-100"
+                        style="max-height: 80vh; object-fit: contain;"
+                    >
+
+                    <!-- Close Button -->
+                    <button
+                        class="btn btn-light position-absolute top-0 end-0 m-3"
+                        @click="closeLightbox()"
+                    >
+                        ✕
+                    </button>
+
+                    <!-- Navigation in Lightbox -->
+                    <button
+                        class="btn btn-light position-absolute top-50 start-0 translate-middle-y ms-3"
+                        @click="previousImage()"
+                        x-show="images.length > 1"
+                    >
+                        &#8249;
+                    </button>
+                    <button
+                        class="btn btn-light position-absolute top-50 end-0 translate-middle-y me-3"
+                        @click="nextImage()"
+                        x-show="images.length > 1"
+                    >
+                        &#8250;
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function itemDetailApp() {
+    return {
+        images: [],
+        currentIndex: 0,
+        lightboxOpen: false,
+
+        get currentImage() {
+            return this.images[this.currentIndex] || {};
+        },
+
+        initGallery() {
+            // Initialize images from Django template
+            this.images = [
+                {% for image in item.images.all %}
+                {
+                    url: '{{ image.image.url }}',
+                    thumbnail: '{% load thumbnail %}{% thumbnail image.image 300x200 crop %}',
+                    alt: '{{ item.title }} - Immagine {{ forloop.counter }}'
+                }{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ];
+        },
+
+        setCurrentImage(index) {
+            this.currentIndex = index;
+        },
+
+        nextImage() {
+            this.currentIndex = (this.currentIndex + 1) % this.images.length;
+        },
+
+        previousImage() {
+            this.currentIndex = this.currentIndex === 0 ? this.images.length - 1 : this.currentIndex - 1;
+        },
+
+        openLightbox() {
+            this.lightboxOpen = true;
+            document.body.style.overflow = 'hidden';
+        },
+
+        closeLightbox() {
+            this.lightboxOpen = false;
+            document.body.style.overflow = '';
+        }
+    }
+}
+
+// Close lightbox with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        Alpine.store('lightbox', false);
+    }
+});
+</script>
+{% endblock %}

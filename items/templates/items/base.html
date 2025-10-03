@@ -1,0 +1,249 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Casa Betti - Bacheca{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&family=EB+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        {% if site_settings.header_background_image %}
+        :root {
+            --header-bg-image: url('{{ site_settings.header_background_image.url }}');
+        }
+        {% endif %}
+        :root {
+            --vintage-cream: #f5f0e8;
+            --vintage-brown: #5c4033;
+            --vintage-dark: #3a2921;
+            --vintage-gold: #b8860b;
+            --vintage-paper: #ede0d4;
+            --vintage-red: #8b4049;
+        }
+
+        body {
+            background-color: var(--vintage-cream);
+            background-image:
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(92, 64, 51, 0.02) 2px, rgba(92, 64, 51, 0.02) 4px);
+            font-family: 'Crimson Text', Georgia, serif;
+            color: var(--vintage-dark);
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--vintage-brown) 0%, var(--vintage-dark) 100%) !important;
+            border-bottom: 3px solid var(--vintage-gold);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            padding: 1rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navbar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.7;
+            z-index: 0;
+        }
+
+        .navbar.has-background::before {
+            background-image: var(--header-bg-image);
+        }
+
+        .navbar > .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .navbar-brand {
+            font-family: 'EB Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        /* Wooden frame effect when background image is present */
+        .has-background .navbar-brand {
+            background-image: url("{% static 'items/layout/woden.jpeg' %}");
+            background-size: cover;
+            background-position: center;
+            padding: 0.6rem 1.5rem;
+            border: 4px solid #3a2921;
+            border-radius: 8px;
+            box-shadow:
+                inset 0 2px 4px rgba(255, 255, 255, 0.3),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.5),
+                0 4px 8px rgba(0, 0, 0, 0.8),
+                0 0 0 2px rgba(184, 134, 11, 0.5);
+            color: #f5f0e8;
+            text-shadow:
+                2px 2px 4px rgba(0,0,0,0.9),
+                -1px -1px 2px rgba(0,0,0,0.5),
+                0 0 10px rgba(0,0,0,0.7);
+        }
+
+        .clickable-card {
+            cursor: pointer;
+        }
+
+        .item-card {
+            background: var(--vintage-paper);
+            border: 2px solid var(--vintage-brown);
+            border-radius: 4px;
+            box-shadow:
+                0 4px 6px rgba(0,0,0,0.2),
+                inset 0 1px 0 rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .clickable-card:hover .item-card,
+        .item-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+
+        .item-image {
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 2px solid var(--vintage-brown);
+            filter: sepia(15%) contrast(95%) brightness(98%);
+        }
+
+        .card-body {
+            background: linear-gradient(to bottom, var(--vintage-paper) 0%, var(--vintage-cream) 100%);
+        }
+
+        .card-title {
+            font-family: 'EB Garamond', serif;
+            font-weight: 600;
+            font-size: 1.4rem;
+            color: var(--vintage-dark);
+            border-bottom: 1px solid var(--vintage-gold);
+            padding-bottom: 0.3rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .card-text {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #4a4a4a;
+        }
+
+        .price-tag {
+            background: linear-gradient(135deg, var(--vintage-red) 0%, #6b2d35 100%);
+            color: var(--vintage-cream);
+            font-weight: bold;
+            font-family: 'EB Garamond', serif;
+            font-size: 1.1rem;
+            padding: 0.5rem 0.8rem;
+            border: 2px solid var(--vintage-gold);
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+        }
+
+        .category-badge {
+            background: rgba(245, 240, 232, 0.95);
+            border: 1px solid var(--vintage-brown);
+            color: var(--vintage-brown);
+            font-weight: 600;
+            padding: 0.4rem 0.7rem;
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .btn-primary, .btn-outline-primary {
+            background: linear-gradient(135deg, var(--vintage-brown) 0%, var(--vintage-dark) 100%);
+            border: 2px solid var(--vintage-gold);
+            color: var(--vintage-cream) !important;
+            font-family: 'EB Garamond', serif;
+            font-weight: 600;
+            padding: 0.5rem 1.2rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary:hover, .btn-outline-primary:hover {
+            background: linear-gradient(135deg, var(--vintage-dark) 0%, var(--vintage-brown) 100%);
+            border-color: var(--vintage-gold);
+            color: var(--vintage-cream) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .form-control, .form-select {
+            background: var(--vintage-paper);
+            border: 2px solid var(--vintage-brown);
+            color: var(--vintage-dark);
+            font-family: 'Crimson Text', serif;
+            padding: 0.6rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: #fff;
+            border-color: var(--vintage-gold);
+            box-shadow: 0 0 0 0.2rem rgba(184, 134, 11, 0.25);
+        }
+
+        .text-muted {
+            color: #6b5d54 !important;
+            font-style: italic;
+        }
+
+        .spinner-border {
+            border-color: var(--vintage-brown);
+            border-right-color: transparent;
+        }
+
+        /* Custom scrollbar for gallery thumbnails */
+        .overflow-auto::-webkit-scrollbar {
+            height: 10px;
+        }
+
+        .overflow-auto::-webkit-scrollbar-track {
+            background: var(--vintage-paper);
+            border: 1px solid var(--vintage-brown);
+            border-radius: 5px;
+        }
+
+        .overflow-auto::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--vintage-brown) 0%, var(--vintage-dark) 100%);
+            border-radius: 5px;
+            border: 1px solid var(--vintage-gold);
+        }
+
+        .overflow-auto::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--vintage-dark) 0%, var(--vintage-brown) 100%);
+        }
+
+        /* Firefox scrollbar */
+        .overflow-auto {
+            scrollbar-width: thin;
+            scrollbar-color: var(--vintage-brown) var(--vintage-paper);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark{% if site_settings.header_background_image %} has-background{% endif %}">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{% url 'item_list' %}">
+                {{ site_settings.site_title|default:"Casa Betti" }}
+            </a>
+        </div>
+    </nav>
+
+    <main class="container my-4">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

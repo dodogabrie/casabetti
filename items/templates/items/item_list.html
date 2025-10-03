@@ -1,0 +1,103 @@
+{% extends 'items/base.html' %}
+
+{% block content %}
+<div x-data="itemsApp()" x-init="loadItems()">
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <input
+                type="text"
+                class="form-control"
+                placeholder="Cerca articoli..."
+                x-model="searchQuery"
+                @input.debounce.300ms="loadItems()"
+            >
+        </div>
+        <div class="col-md-6">
+            <select
+                class="form-select"
+                x-model="selectedCategory"
+                @change="loadItems()"
+            >
+                <option value="">Tutte le categorie</option>
+                {% for category_code, category_name in categories %}
+                <option value="{{ category_code }}">{{ category_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div x-show="loading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Caricamento...</span>
+        </div>
+    </div>
+
+    <!-- Items Grid -->
+    <div class="row" x-show="!loading">
+        <template x-for="item in items" :key="item.id">
+            <div class="col-md-6 col-lg-4 mb-4">
+                <a :href="`/items/${item.id}/`" class="text-decoration-none">
+                    <div class="card item-card h-100 shadow-sm clickable-card">
+                        <div class="position-relative">
+                            <img
+                                :src="item.main_image_thumbnail || '/static/placeholder.jpg'"
+                                :alt="item.title"
+                                class="card-img-top item-image"
+                            >
+                            <span class="badge price-tag position-absolute top-0 end-0 m-2">
+                                €<span x-text="item.price"></span>
+                            </span>
+                            <span class="badge category-badge position-absolute bottom-0 start-0 m-2" x-text="item.category"></span>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title" x-text="item.title"></h5>
+                            <p class="card-text flex-grow-1" x-text="item.description"></p>
+                            <div class="d-flex justify-content-end align-items-center">
+                                <small class="text-muted">
+                                    <span x-text="item.images_count"></span> foto
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </template>
+    </div>
+
+    <!-- No Results -->
+    <div x-show="!loading && items.length === 0" class="text-center py-5">
+        <h3 class="text-muted">Nessun articolo trovato</h3>
+        <p class="text-muted">Prova a modificare i filtri di ricerca</p>
+    </div>
+</div>
+
+<script>
+function itemsApp() {
+    return {
+        items: [],
+        loading: false,
+        searchQuery: '{{ search_query|default:"" }}',
+        selectedCategory: '{{ current_category|default:"" }}',
+
+        async loadItems() {
+            this.loading = true;
+            try {
+                const params = new URLSearchParams();
+                if (this.searchQuery) params.set('search', this.searchQuery);
+                if (this.selectedCategory) params.set('category', this.selectedCategory);
+
+                const response = await fetch(`/api/items/?${params}`);
+                const data = await response.json();
+                this.items = data.items;
+            } catch (error) {
+                console.error('Error loading items:', error);
+            } finally {
+                this.loading = false;
+            }
+        }
+    }
+}
+</script>
+{% endblock %}
