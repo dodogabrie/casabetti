@@ -139,6 +139,15 @@
             color: #4a4a4a;
         }
 
+        .item-description {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 4.8em;
+        }
+
         .price-tag {
             background: linear-gradient(135deg, var(--vintage-red) 0%, #6b2d35 100%);
             color: var(--vintage-cream);
@@ -233,7 +242,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark{% if site_settings.header_background_image %} has-background{% endif %}">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="{% url 'item_list' %}">
+            <a class="navbar-brand fw-bold" href="{% url 'home' %}">
                 {{ site_settings.site_title|default:"Casa Betti" }}
             </a>
         </div>

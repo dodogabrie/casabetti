@@ -180,11 +180,13 @@ function itemDetailApp() {
             // Initialize images from Django template
             this.images = [
                 {% for image in item.images.all %}
+                {% if image.image %}
                 {
                     url: '{{ image.image.url }}',
                     thumbnail: '{% load thumbnail %}{% thumbnail image.image 300x200 crop %}',
                     alt: '{{ item.title }} - Immagine {{ forloop.counter }}'
                 }{% if not forloop.last %},{% endif %}
+                {% endif %}
                 {% endfor %}
             ];
         },

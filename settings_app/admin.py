@@ -17,6 +17,10 @@ class SiteSettingsAdmin(admin.ModelAdmin):
             'fields': ('site_title',),
             'description': 'Configurazione generale del sito'
         }),
+        ('Home Page', {
+            'fields': ('home_welcome_title', 'home_intro_text', 'home_background_image'),
+            'description': 'Contenuti visualizzati nella pagina home'
+        }),
         ('Aspetto Visivo', {
             'fields': ('header_background_image',),
             'description': 'Configura l\'aspetto visivo del sito'

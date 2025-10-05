@@ -3,6 +3,10 @@ from django.http import JsonResponse
 from .models import Item
 
 
+def home(request):
+    return render(request, 'items/home.html')
+
+
 def item_list(request):
     items = Item.objects.filter(status='available').prefetch_related('images')
 
