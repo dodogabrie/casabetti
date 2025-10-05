@@ -10,7 +10,7 @@ services:
       - media_files:/app/media
       - static_files:/app/staticfiles
     ports:
-      - "8000:8000"
+      - "8081:8000"
     environment:
       - DEBUG=1
       - DJANGO_SETTINGS_MODULE=casa_betti_bacheca.settings
