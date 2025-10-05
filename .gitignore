@@ -1,36 +1,134 @@
-# Python
+# ============================================
+# PYTHON & DJANGO PROJECT .gitignore (MERGED)
+# ============================================
+
+# --- Python ---
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
-venv/
-env/
-ENV/
-*.egg-info/
-dist/
-build/
 
-# Django
+# --- Packaging ---
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# --- PyInstaller ---
+*.manifest
+*.spec
+
+# --- Logs & Reports ---
 *.log
+pip-log.txt
+pip-delete-this-directory.txt
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py.cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# --- Translations ---
+*.mo
+*.pot
+
+# --- Django ---
+local_settings.py
 db.sqlite3
 db.sqlite3-journal
 /media
 /staticfiles
-local_settings.py
 
-# Environment variables
+# --- Flask ---
+instance/
+.webassets-cache
+
+# --- Documentation ---
+docs/_build/
+
+# --- Virtual Environments ---
 .env
 .env.local
+.envrc
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
 
-# IDE
+# --- IDEs & Editors ---
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 .DS_Store
+.spyderproject
+.spyproject
+.ropeproject
+.cursorignore
+.cursorindexingignore
 
-# Thumbnails
+# --- OS / Misc ---
 ._*
 Thumbs.db
+.marimo/
+marimo/_static/
+marimo/_lsp/
+__marimo__/
+
+# --- Type Checking & Analysis ---
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+.ruff_cache/
+cython_debug/
+
+# --- PyPI configuration ---
+.pypirc
+
+# --- Abstra (AI automation framework) ---
+.abstra/
+
+# --- Ignore Jupyter, Celery, etc. ---
+.ipynb_checkpoints
+celerybeat-schedule
+celerybeat.pid
+
+# --- PyBuilder ---
+.pybuilder/
+target/
+
+# --- PEP 582 ---
+__pypackages__/
+
+# --- Node / Frontend (if any static assets) ---
+node_modules/
+
+# --- System ---
+.DS_Store
